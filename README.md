@@ -1,13 +1,19 @@
 # WebSocket Relay Server
 
-This repository provides the source code of the WebSocket API server application hosted on [Qoosky](https://www.qoosky.io/).  Users can connect their IoT devices such as Raspberry Pi, Arduino, and Android Things to the server using WebSocket with a pre-generated API token.  They can control their devices with the corresponding JavaScript WebSocket client of same API token available at  https://www.qoosky.io/account/api/cc using their PC or smartphone browsers.  Qoosky API server relays WebSocket messages from IoT devices or JavaScript clients to the other corresponding clients in real-time.
+This repository provides the source code of the WebSocket API server application hosted on [Qoosky](https://www.qoosky.io/).  Users can connect their IoT devices such as Raspberry Pi, Arduino, and Android Things to the server using WebSocket with a pre-generated API token.  They can control their devices with the corresponding JavaScript WebSocket client of the same API token available at  https://www.qoosky.io/account/api/cc using their PC or smartphone browsers.  Qoosky API server relays WebSocket messages from IoT devices or JavaScript clients to the other corresponding clients in real-time.
 
 Feel free to test this server application on your host, or fork it and customize to create some more interesting applications.
 
 
 ## Screenshots
 
-TODO
+	README.md (here)
+	src/test/scala/qoosky/cloudapi/actors/SupervisorSpec.scala
+	src/test/scala/qoosky/cloudapi/actors/ActuatorActorKeypadActorSpec.scala
+	src/main/scala/qoosky/cloudapi/actors/ActuatorActor.scala
+	src/main/scala/qoosky/cloudapi/actors/KeypadActor.scala
+	src/test/scala/qoosky/cloudapi/actors/WebSocketHandlerSpec.scala
+	src/main/scala/qoosky/cloudapi/actors/WebSocketHandler.scala
 
 
 ## Languages
@@ -62,14 +68,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
-
-## TODO
-
-	README.md (here and TODO x1)
-	src/test/scala/qoosky/cloudapi/actors/SupervisorSpec.scala
-	src/test/scala/qoosky/cloudapi/actors/ActuatorActorKeypadActorSpec.scala
-	src/main/scala/qoosky/cloudapi/actors/ActuatorActor.scala
-	src/main/scala/qoosky/cloudapi/actors/KeypadActor.scala
-	src/test/scala/qoosky/cloudapi/actors/WebSocketHandlerSpec.scala
-	src/main/scala/qoosky/cloudapi/actors/WebSocketHandler.scala
