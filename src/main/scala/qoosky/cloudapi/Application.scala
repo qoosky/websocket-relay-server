@@ -3,22 +3,25 @@ package qoosky.cloudapi
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
-import com.typesafe.config.ConfigFactory
-import org.slf4j.LoggerFactory
-import scala.concurrent.Future
+import com.typesafe.config.{Config, ConfigFactory}
+import org.slf4j.{Logger, LoggerFactory}
+
+import scala.concurrent.{ExecutionContextExecutor, Future}
 import scala.util.{Failure, Success}
 
 class Application extends ApplicationLifecycle {
 
-  val config = ConfigFactory.load
-  val logger = LoggerFactory.getLogger("Application")
-  val applicationName = "cloudapi"
+  val config: Config = ConfigFactory.load
+  val logger: Logger = LoggerFactory.getLogger("Application")
+  val applicationName = "websocket_relay_server"
 
-  implicit val system = ActorSystem(s"$applicationName-system")
-  implicit val materializer = ActorMaterializer()
-  implicit val ec = system.dispatcher
+  implicit val system: ActorSystem = ActorSystem(s"$applicationName-system")
+  implicit val materializer: ActorMaterializer = ActorMaterializer()
+  implicit val ec: ExecutionContextExecutor = system.dispatcher
 
-  val service = new WebService(system)
+  val service: WebService = {
+    new WebService(system)
+  }
 
   var started: Boolean = false
   var bindingFuture: Option[Future[Http.ServerBinding]] = None
@@ -32,14 +35,12 @@ class Application extends ApplicationLifecycle {
       bindingFuture = Some(Http().bindAndHandle(service.route, defaultInterface, port))
       started = true
       bindingFuture.foreach(_.onComplete {
-        case Success(binding) => {
+        case Success(_) =>
           logger.info(s"Server online at http://127.0.0.1:$port/")
-        }
-        case Failure(e) => {
+        case Failure(e) =>
           logger.info(s"Binding failed with ${e.getMessage}")
           system.terminate()
           started = false
-        }
       })
     }
   }

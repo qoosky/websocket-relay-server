@@ -1,5 +1,5 @@
 <configuration>
-  <property name="APP_NAME" value="cloudapi" />
+  <property name="APP_NAME" value="websocket_relay_server" />
   <property name="LOG_DIR" value="./log" />
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <file>${LOG_DIR}/${APP_NAME}.log</file>

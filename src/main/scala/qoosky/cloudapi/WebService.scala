@@ -3,13 +3,15 @@ package qoosky.cloudapi
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.http.scaladsl.model.ws._
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.Route
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl._
-import org.slf4j.LoggerFactory
+import org.slf4j.{Logger, LoggerFactory}
+import qoosky.cloudapi.actors._
 
 class WebService(system: ActorSystem) {
 
-  val logger = LoggerFactory.getLogger("WebService")
+  val logger: Logger = LoggerFactory.getLogger("WebService")
   val webSocketBufferSize = 5
   var actuatorId = 0
   var keypadId = 0
@@ -22,13 +24,12 @@ class WebService(system: ActorSystem) {
 
   val backToWebSocket: Flow[ActorMessage, Message, _] = Flow[ActorMessage].map {
     case WebSocketMessage(txt) => TextMessage(txt)
-    case x: ActorMessage => {
-      logger.error("Expected WebSocketMessage, but unexpected ActorMessage was sent: %s" format x)
+    case x: ActorMessage =>
+      logger.error("Expected WebSocketMessage, but received ActorMessage unexpectedly: %s" format x)
       throw new RuntimeException
-    }
   }
 
-  // Raspberry Pi, Arduino, Android Things...
+  // Raspberry Pi, Arduino, Android Things, etc...
   def actuatorWebSocketService: Flow[Message, Message, _] = {
     val actuator: ActorRef = system.actorOf(Props[ActuatorActor], name = "ActuatorActor-%d".format(actuatorId))
     val fromActor: Source[ActorMessage, _] = Source.actorRef[ActorMessage](bufferSize = webSocketBufferSize, OverflowStrategy.dropHead).mapMaterializedValue{ webSocket: ActorRef =>
@@ -54,7 +55,7 @@ class WebService(system: ActorSystem) {
     Flow.fromSinkAndSource(in, out)
   }
 
-  def route = path("") {
+  def route: Route = path("") {
     get {
       complete("The latest API version is /v1")
     }

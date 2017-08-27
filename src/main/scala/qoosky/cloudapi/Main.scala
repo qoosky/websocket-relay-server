@@ -13,9 +13,9 @@ class ApplicationDaemon extends Daemon {
   def init(daemonContext: DaemonContext): Unit = {}
 
   val app: ApplicationLifecycle = new Application
-  def start() = app.start()
-  def stop() = app.stop()
-  def destroy() = app.stop()
+  def start(): Unit = app.start()
+  def stop(): Unit = app.stop()
+  def destroy(): Unit = app.stop()
 }
 
 object Main {
