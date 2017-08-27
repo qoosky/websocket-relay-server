@@ -1,2 +1,7 @@
-.gradle/
-build/
+.idea/
+*.iml
+.ensime
+.ensime_cache/
+lib_managed/
+log/*.log*
+target/

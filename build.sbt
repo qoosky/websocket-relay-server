@@ -22,28 +22,25 @@
  * SOFTWARE.
  */
 
-description = 'Relay WebSocket messages to multiple connected clients, a server library used in Qoosky Cloud Controller API.'
-version = '1.0'
-
-apply plugin: 'java-library'
-
-ext {
-    javaVersion = '1.8'
-    scalaVersion = '2.12'
-}
-
-repositories {
-    jcenter()
-}
-
-sourceCompatibility = "${javaVersion}"
-targetCompatibility = "${javaVersion}"
-
-dependencies {
-    implementation "ch.qos.logback:logback-classic:1.2.3"
-    implementation "org.slf4j:slf4j-api:1.7.25"
-    implementation "com.typesafe.akka:akka-slf4j_${scalaVersion}:2.5.4"
-    implementation "com.typesafe.akka:akka-http_${scalaVersion}:10.0.9"
-    testImplementation "junit:junit:4.12"
-    testImplementation "com.typesafe.akka:akka-testkit_${scalaVersion}:2.5.4"
-}
+lazy val root = (project in file(".")).
+  settings(
+    name := "websocket_relay_server",
+    version := "1.0",
+    scalaVersion := "2.12.3",
+    mainClass in assembly := Some("qoosky.cloudapi.Main"),
+    retrieveManaged := true,
+    parallelExecution := false,
+    libraryDependencies ++= Seq(
+      "org.scalatest" %% "scalatest" % "3.0.4" % "test",
+      "ch.qos.logback" % "logback-classic" % "1.2.3",
+      "org.slf4j" % "slf4j-api" % "1.7.25",
+      "com.typesafe.akka" %% "akka-testkit" % "2.5.4",
+      "com.typesafe.akka" %% "akka-slf4j" % "2.5.4",
+      "com.typesafe.akka" %% "akka-actor" % "2.5.4",
+      "com.typesafe.akka" %% "akka-stream" % "2.5.4",
+      "com.typesafe.akka" %% "akka-http" % "10.0.9",
+      "com.typesafe.akka" %% "akka-http-spray-json" % "10.0.9",
+      "com.typesafe.akka" %% "akka-http-xml" % "10.0.9",
+      "commons-daemon" % "commons-daemon" % "1.0.15"
+    )
+  )
