@@ -19,7 +19,7 @@ class WebService(system: ActorSystem) {
   val supervisor: ActorRef = system.actorOf(Props[Supervisor], name = "Supervisor")
 
   val fromWebSocket: Flow[Message, ActorMessage, _] = Flow[Message].collect {
-    case TextMessage.Strict(txt) => WebSocketMessage(txt) // Ignore incomplete (part of a big message) or binary messages.
+    case TextMessage.Strict(txt) => WebSocketMessage(txt) // Ignore incomplete (part of a large message) or binary messages.
   }
 
   val backToWebSocket: Flow[ActorMessage, Message, _] = Flow[ActorMessage].map {
