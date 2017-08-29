@@ -29,7 +29,7 @@ class KeypadActor extends WebSocketHandler {
         notification = None
         actuator = Some(sender)
         actuator.foreach(context.watch)
-        token.foreach(sender ! ConnectionRequest(_))
+        cid.foreach(sender ! ConnectionRequest(_))
         notify("Successfully connected to your actuator device.")
       }
     case x => defaultBehavior(x)

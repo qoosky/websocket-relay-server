@@ -16,6 +16,7 @@ class WebSocketHandlerImpl extends WebSocketHandler {
 class WebSocketHandlerSpec extends FunSpec with BeforeAndAfter {
 
   implicit val system: ActorSystem = ActorSystem("test-cloudapi-system")
+  val validJsonToken = "XXXX-XXXX-XXXX-XXXX"
   var wsHandlerRef: TestActorRef[WebSocketHandlerImpl] = _
   var wsHandler: WebSocketHandlerImpl = _
   var wsInterfaceRef: TestActorRef[WebSocketActor] = _
@@ -33,7 +34,7 @@ class WebSocketHandlerSpec extends FunSpec with BeforeAndAfter {
     system.stop(wsInterfaceRef)
   }
 
-  describe("Test Exceptional event") {
+  describe("Exceptional event") {
     it("Stop automatically if receives a message when WebSocketInterface is None") {
       wsHandler.notify("message")
       intercept[IllegalActorStateException] {
@@ -42,7 +43,7 @@ class WebSocketHandlerSpec extends FunSpec with BeforeAndAfter {
     }
   }
 
-  describe("Test notify") {
+  describe("notify and sendRaw") {
     it("Send string") {
       wsHandlerRef ! WebSocketInterface(wsInterfaceRef)
       wsHandler.notify("message123")
@@ -52,14 +53,14 @@ class WebSocketHandlerSpec extends FunSpec with BeforeAndAfter {
     }
   }
 
-  describe("Scheduled message, SendStatusNotification test") {
-    it("Do not send if None") {
+  describe("Scheduled `SendStatusNotification` messages") {
+    it("Do not send if notification is None") {
       wsHandlerRef ! WebSocketInterface(wsInterfaceRef)
       wsHandler.notification = None
       wsHandlerRef ! SendStatusNotification
       assertResult(null)(wsInterface.lastMessage)
     }
-    it("Send if not None") {
+    it("Send if notification is not None") {
       wsHandlerRef ! WebSocketInterface(wsInterfaceRef)
       wsHandler.notification = Some("hello")
       wsHandlerRef ! SendStatusNotification
@@ -68,7 +69,7 @@ class WebSocketHandlerSpec extends FunSpec with BeforeAndAfter {
   }
 
   describe("WebSocketInterface management") {
-    it("Save") {
+    it("WebSocketHandler saves WebSocketInterface") {
       wsHandlerRef ! WebSocketInterface(wsInterfaceRef)
       wsHandler.notify("message123")
       assertResult("""{"notification":"message123"}""")(wsInterface.lastMessage)
@@ -82,7 +83,7 @@ class WebSocketHandlerSpec extends FunSpec with BeforeAndAfter {
         assertResult(null)(wsHandlerRef.underlyingActor)
       }
     }
-    it("WebSocketInterface also stops when disconnected") {
+    it("WebSocketHandler and WebSocketInterface stop when disconnected") {
       wsHandlerRef ! WebSocketInterface(wsInterfaceRef)
       wsHandlerRef ! Disconnected
       intercept[RuntimeException] {
@@ -91,137 +92,58 @@ class WebSocketHandlerSpec extends FunSpec with BeforeAndAfter {
     }
   }
 
-  // describe("setCid/logout test") {
-  //   it("first setCid") {
-  //     assert(actuator.setCid(tokenValidEnabled))
-  //     assert(keypad.setCid(tokenValidEnabled))
-  //     assertResult(Some(1))(actuator.cid)
-  //     assertResult(Some(2))(keypad.cid)
-  //   }
-  //   it("after setCid") {
-  //     assert(actuator.setCid(tokenValidEnabled))
-  //     assert(!actuator.setCid(tokenValidEnabled))
-  //     assert(keypad.setCid(tokenValidEnabled))
-  //     assert(!keypad.setCid(tokenValidEnabled))
-  //   }
-  //   it("setCid after logout") {
-  //     assert(actuator.setCid(tokenValidEnabled))
-  //     assert(actuator.logout)
-  //     assert(actuator.setCid(tokenValidEnabled))
-  //     assert(keypad.setCid(tokenValidEnabled))
-  //     assert(keypad.logout)
-  //     assert(keypad.setCid(tokenValidEnabled))
-  //   }
-  //   it("logout without setCid") {
-  //     assert(!actuator.logout)
-  //     assert(!keypad.logout)
-  //   }
-  //   it("cid becomes None if logout") {
-  //     assert(actuator.setCid(tokenValidEnabled))
-  //     assert(keypad.setCid(tokenValidEnabled))
-  //     assertResult(Some(1))(actuator.cid)
-  //     assertResult(Some(2))(keypad.cid)
-  //     assert(actuator.logout)
-  //     assert(keypad.logout)
-  //     assertResult(None)(actuator.cid)
-  //     assertResult(None)(keypad.cid)
-  //   }
-  //   it("setCid fails if the same token is used for the same login type") {
-  //     assert(actuator.setCid(tokenValidEnabled))
-  //     assert(!actuator2.setCid(tokenValidEnabled))
-  //     assertResult(Some(1))(actuator.cid)
-  //     assertResult(None)(actuator2.cid)
-  //     assert(keypad.setCid(tokenValidEnabled))
-  //     assert(!keypad2.setCid(tokenValidEnabled))
-  //     assertResult(Some(2))(keypad.cid)
-  //     assertResult(None)(keypad2.cid)
-  //     assert(actuator.logout)
-  //     assert(!actuator2.logout)
-  //     assert(keypad.logout)
-  //     assert(!keypad2.logout)
-  //   }
-  //   it("setCid fails if invalid token is provided") {
-  //     assert(!actuator.setCid(tokenInvalid))
-  //     assert(!keypad.setCid(tokenInvalid))
-  //     assertResult(None)(actuator.cid)
-  //     assertResult(None)(keypad.cid)
-  //   }
-  //   describe("valid but yet used to update DB record on login session is provided") {
-  //     it("Actuator can setCid") {
-  //       assert(actuator.setCid(tokenValidNotEnabled))
-  //       assertResult(Some(1))(actuator.cid)
-  //     }
-  //     it("Keypad cannot setCid") {
-  //       assert(!keypad.setCid(tokenValidNotEnabled))
-  //       assertResult(None)(keypad.cid)
-  //     }
-  //   }
-  // }
+  describe("login") {
+    it("Valid json API token is provided") {
+      assert(wsHandler.login("""{"token": "%s"}""" format validJsonToken)._1)
+      assertResult(Some(validJsonToken))(wsHandler.cid)
+    }
+    it("Valid json but invalid API token is provided") {
+      assert(!wsHandler.login("""{"key": "%s"}""" format validJsonToken)._1)
+      assertResult(None)(wsHandler.cid)
+    }
+    it("Invalid json string") {
+      assert(!wsHandler.login("mystring")._1)
+      assertResult(None)(wsHandler.cid)
+    }
+    it("Login fails if the same token is used for the same WebSocketHandler") {
+      assert(wsHandler.login("""{"token": "%s"}""" format validJsonToken)._1)
+      assertResult(Some(validJsonToken))(wsHandler.cid)
+      assert(!wsHandler.login("""{"token": "%s"}""" format validJsonToken)._1)
+      assertResult(Some(validJsonToken))(wsHandler.cid)
+    }
+  }
 
+  // TODO
   // describe("searchPairCid test") {
   //   it("search setCid completed pair") {
-  //     assert(actuator.setCid(tokenValidEnabled))
-  //     assert(keypad.setCid(tokenValidEnabled))
-  //     assertResult(keypad.cid)(actuator.searchPairCid(tokenValidEnabled))
-  //     assertResult(actuator.cid)(keypad.searchPairCid(tokenValidEnabled))
+  //     assert(actuator.setCid(validJsonToken))
+  //     assert(keypad.setCid(validJsonToken))
+  //     assertResult(keypad.cid)(actuator.searchPairCid(validJsonToken))
+  //     assertResult(actuator.cid)(keypad.searchPairCid(validJsonToken))
   //   }
   //   it("pair does not exist") {
-  //     assertResult(None)(actuator.searchPairCid(tokenValidEnabled))
-  //     assertResult(None)(keypad.searchPairCid(tokenValidEnabled))
-  //   }
-  //   it("pair does not exist if logout") {
-  //     assert(actuator.setCid(tokenValidEnabled))
-  //     assert(keypad.setCid(tokenValidEnabled))
-  //     assertResult(keypad.cid)(actuator.searchPairCid(tokenValidEnabled))
-  //     assertResult(actuator.cid)(keypad.searchPairCid(tokenValidEnabled))
-  //     assert(keypad.logout)
-  //     assertResult(None)(actuator.searchPairCid(tokenValidEnabled))
-  //     assert(actuator.logout)
-  //     assertResult(None)(keypad.searchPairCid(tokenValidEnabled))
+  //     assertResult(None)(actuator.searchPairCid(validJsonToken))
+  //     assertResult(None)(keypad.searchPairCid(validJsonToken))
   //   }
   // }
 
+  // TODO
   // describe("searchComradeCid test") {
   //   it("search setCid completed comrade") {
-  //     assert(actuator.setCid(tokenValidEnabled))
-  //     assert(keypad.setCid(tokenValidEnabled))
-  //     assertResult(actuator.cid)(actuator2.searchComradeCid(tokenValidEnabled))
-  //     assertResult(keypad.cid)(keypad2.searchComradeCid(tokenValidEnabled))
+  //     assert(actuator.setCid(validJsonToken))
+  //     assert(keypad.setCid(validJsonToken))
+  //     assertResult(actuator.cid)(actuator2.searchComradeCid(validJsonToken))
+  //     assertResult(keypad.cid)(keypad2.searchComradeCid(validJsonToken))
   //   }
   //   it("comrade does not exist") {
-  //     assertResult(None)(actuator.searchComradeCid(tokenValidEnabled))
-  //     assertResult(None)(keypad.searchComradeCid(tokenValidEnabled))
+  //     assertResult(None)(actuator.searchComradeCid(validJsonToken))
+  //     assertResult(None)(keypad.searchComradeCid(validJsonToken))
   //   }
   //   it("self cid cannot be searched") {
-  //     assert(actuator.setCid(tokenValidEnabled))
-  //     assert(keypad.setCid(tokenValidEnabled))
-  //     assertResult(None)(actuator.searchComradeCid(tokenValidEnabled))
-  //     assertResult(None)(keypad.searchComradeCid(tokenValidEnabled))
-  //   }
-  //   it("comrade does not exist if logout") {
-  //     assert(actuator.setCid(tokenValidEnabled))
-  //     assert(keypad.setCid(tokenValidEnabled))
-  //     assertResult(actuator.cid)(actuator2.searchComradeCid(tokenValidEnabled))
-  //     assertResult(keypad.cid)(keypad2.searchComradeCid(tokenValidEnabled))
-  //     assert(actuator.logout)
-  //     assertResult(None)(actuator2.searchComradeCid(tokenValidEnabled))
-  //     assert(keypad.logout)
-  //     assertResult(None)(keypad2.searchComradeCid(tokenValidEnabled))
-  //   }
-  // }
-
-  // describe("login test") {
-  //   it("Valid json API token is provided") {
-  //     assert(actuator.login("""{"token": "%s"}""" format tokenValidEnabled)._1)
-  //     assertResult(Some(tokenValidEnabled))(actuator.token)
-  //   }
-  //   it("Valid json but invalid API token is provided") {
-  //     assert(!actuator.login("""{"key": "%s"}""" format tokenValidEnabled)._1)
-  //     assertResult(None)(actuator.token)
-  //   }
-  //   it("Invalid json string") {
-  //     assert(!actuator.login("mystring")._1)
-  //     assertResult(None)(actuator.token)
+  //     assert(actuator.setCid(validJsonToken))
+  //     assert(keypad.setCid(validJsonToken))
+  //     assertResult(None)(actuator.searchComradeCid(validJsonToken))
+  //     assertResult(None)(keypad.searchComradeCid(validJsonToken))
   //   }
   // }
 }

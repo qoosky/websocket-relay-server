@@ -31,7 +31,7 @@ class ActuatorActor extends WebSocketHandler {
   def authenticated: Receive = {
     case WebSocketMessage(_) => notification.foreach(notify)
     case SearchKeypads => context.actorSelection("/user/KeypadActor-*") ! Identify(identifyId)
-    case ActorIdentity(`identifyId`, Some(ref)) => token.foreach(ref ! ConnectionRequest(_))
+    case ActorIdentity(`identifyId`, Some(ref)) => cid.foreach(ref ! ConnectionRequest(_))
     case ActorIdentity(`identifyId`, None) =>
     case ConnectionRequest(c) =>
       if(cid.contains(c)) {

@@ -11,14 +11,12 @@ import scala.language.postfixOps
 trait WebSocketHandler extends Actor {
 
   val logger: org.slf4j.Logger
-  val loginType: String
-  val identifyIdPurge = 2
+  val loginType: String // TODO
+  val identifyIdPurge = 2 // TODO
   private var webSocket: Option[ActorRef] = None
   var notification: Option[String] = None
-  var comradeCid: Option[String] = None
-  var purgeRetry = 2
+  var comradeCid: Option[String] = None // TODO
   var cid: Option[String] = None
-  var token: Option[String] = None
 
   context.system.scheduler.schedule(2 seconds, 1 second, self, SendStatusNotification)
 
@@ -41,38 +39,17 @@ trait WebSocketHandler extends Actor {
       val jsonMap = jsonStr.parseJson.convertTo[Map[String, String]]
       jsonMap.get("token") match {
         case Some(t) =>
-          if(setCid(t)) {
-            token = Some(t)
-            (true, "Authentication success.")
+          if(cid.isEmpty) {
+            cid = Some(t)
+            (true, "Login success.")
           }
-          else (false, "Invalid Qoosky API token. Authentication failure.")
+          else (false, "Already logged in.")
         case None => (false, "`token` is missing. Please provide your Qoosky API token in the specified json format.")
       }
     } catch {
-      case e: Throwable =>
+      case e: Exception =>
         logger.warn("Invalid API token was provided: %s" format e)
         (false, "json format is invalid. Please provide your Qoosky API token in the specified format.")
-    }
-  }
-
-  def setCid(token: String): Boolean = {
-    if(cid.isDefined) return false
-    try {
-      logger.info("validate Api Token and set cid.")
-      cid = Some(token)
-      logger.info("setCid success.")
-      true
-    } catch {
-      case e: Throwable => throw new RuntimeException("setCid failure: %s" format e)
-    }
-  }
-
-  def logout: Boolean = {
-    cid match {
-      case Some(_) =>
-        cid = None // Do not delete token.
-        true
-      case None => false
     }
   }
 
@@ -82,23 +59,22 @@ trait WebSocketHandler extends Actor {
       case WebSocketInterface(ref) =>
         webSocket = Some(ref)
         context.watch(ref)
-      case ActorIdentity(`identifyIdPurge`, Some(ref)) => comradeCid.foreach(ref ! DisconnectionRequest(_))
-      case ActorIdentity(`identifyIdPurge`, None) =>
+      case ActorIdentity(`identifyIdPurge`, Some(ref)) => comradeCid.foreach(ref ! DisconnectionRequest(_)) // TODO
+      case ActorIdentity(`identifyIdPurge`, None) => // TODO
       case Disconnected =>
         logger.info("stopping... %s" format self)
         webSocket.foreach { ref =>
           context.stop(ref)
           webSocket = None
         }
-        logout
         context.stop(self)
-      case DisconnectionRequest(c) =>
+      case DisconnectionRequest(c) => // TODO
         if(cid.contains(c)) {
           notify("Detected another device. Disconnecting...")
           self ! Disconnected
         }
       case Terminated(ref) => if (webSocket.contains(ref)) webSocket = None
-      case x: Any => logger.warn("Unexpected message was sent: %s from %s" format(x, sender))
+      case x: Any => logger.warn("Received unexpected message: %s from %s" format(x, sender))
     }
   }
 }

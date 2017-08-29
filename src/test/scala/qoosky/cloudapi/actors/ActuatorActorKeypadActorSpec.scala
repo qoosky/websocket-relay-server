@@ -71,69 +71,69 @@ class ActuatorActorKeypadActorSpec extends FunSpec with BeforeAndAfter {
     }
   }
 
-  describe("Connection test of Actuator and Keypad") {
-    it("Success if each type has only one actor") {
-      actRef ! WebSocketMessage("""{"token": "%s"}""" format token)
-      keyRef ! WebSocketMessage("""{"token": "%s"}""" format token)
-      actRef ! ActorIdentity(identifyId, Some(keyRef))
-      assertResult(None)(act.notification)
-      assertResult(None)(key.notification)
-      assertResult(Some(keyRef))(act.keypad)
-      assertResult(Some(actRef))(key.actuator)
-    }
-  }
+  // describe("Connection test of Actuator and Keypad") {
+  //   it("Success if each type has only one actor") {
+  //     actRef ! WebSocketMessage("""{"token": "%s"}""" format token)
+  //     keyRef ! WebSocketMessage("""{"token": "%s"}""" format token)
+  //     actRef ! ActorIdentity(identifyId, Some(keyRef))
+  //     assertResult(None)(act.notification)
+  //     assertResult(None)(key.notification)
+  //     assertResult(Some(keyRef))(act.keypad)
+  //     assertResult(Some(actRef))(key.actuator)
+  //   }
+  // }
 
-  describe("Bi-directional communication test") {
-    it("Success if each type has only one actor") {
-      actRef ! WebSocketMessage("""{"token": "%s"}""" format token)
-      keyRef ! WebSocketMessage("""{"token": "%s"}""" format token)
-      actRef ! ActorIdentity(identifyId, Some(keyRef))
-      actRef ! WebSocketMessage("""{"key1":"val1"}""")
-      assertResult("""{"key1":"val1"}""")(keyWs.lastMessage)
-      keyRef ! WebSocketMessage("""{"key2":"val2"}""")
-      assertResult("""{"key2":"val2"}""")(actWs.lastMessage)
-    }
-    it("Restore when Actuator is disconnected") {
-      actRef ! WebSocketMessage("""{"token": "%s"}""" format token)
-      keyRef ! WebSocketMessage("""{"token": "%s"}""" format token)
-      actRef ! ActorIdentity(identifyId, Some(keyRef))
-      actRef ! Disconnected
-      Thread.sleep(100)
-      assert(key.actuator.isEmpty)
-      assert(key.notification.isDefined)
-      actRef = TestActorRef[ActuatorActor]
-      act = actRef.underlyingActor
-      actWsRef = TestActorRef[WebSocketActor]
-      actWs = actWsRef.underlyingActor
-      actRef ! WebSocketInterface(actWsRef)
-      actRef ! WebSocketMessage("""{"token": "%s"}""" format token)
-      actRef ! ActorIdentity(identifyId, Some(keyRef))
-      assertResult(None)(act.notification)
-      assertResult(None)(key.notification)
-      assertResult(Some(keyRef))(act.keypad)
-      assertResult(Some(actRef))(key.actuator)
-    }
-    it("Restore when Keypad is disconnected") {
-      actRef ! WebSocketMessage("""{"token": "%s"}""" format token)
-      keyRef ! WebSocketMessage("""{"token": "%s"}""" format token)
-      actRef ! ActorIdentity(identifyId, Some(keyRef))
-      keyRef ! Disconnected
-      Thread.sleep(100)
-      assert(act.keypad.isEmpty)
-      assert(act.notification.isDefined)
-      keyRef = TestActorRef[KeypadActor]
-      key = keyRef.underlyingActor
-      keyWsRef = TestActorRef[WebSocketActor]
-      keyWs = keyWsRef.underlyingActor
-      keyRef ! WebSocketInterface(keyWsRef)
-      keyRef ! WebSocketMessage("""{"token": "%s"}""" format token)
-      actRef ! ActorIdentity(identifyId, Some(keyRef))
-      assertResult(None)(act.notification)
-      assertResult(None)(key.notification)
-      assertResult(Some(keyRef))(act.keypad)
-      assertResult(Some(actRef))(key.actuator)
-    }
-  }
+  // describe("Bi-directional communication test") {
+  //   it("Success if each type has only one actor") {
+  //     actRef ! WebSocketMessage("""{"token": "%s"}""" format token)
+  //     keyRef ! WebSocketMessage("""{"token": "%s"}""" format token)
+  //     actRef ! ActorIdentity(identifyId, Some(keyRef))
+  //     actRef ! WebSocketMessage("""{"key1":"val1"}""")
+  //     assertResult("""{"key1":"val1"}""")(keyWs.lastMessage)
+  //     keyRef ! WebSocketMessage("""{"key2":"val2"}""")
+  //     assertResult("""{"key2":"val2"}""")(actWs.lastMessage)
+  //   }
+  //   it("Restore when Actuator is disconnected") {
+  //     actRef ! WebSocketMessage("""{"token": "%s"}""" format token)
+  //     keyRef ! WebSocketMessage("""{"token": "%s"}""" format token)
+  //     actRef ! ActorIdentity(identifyId, Some(keyRef))
+  //     actRef ! Disconnected
+  //     Thread.sleep(100)
+  //     assert(key.actuator.isEmpty)
+  //     assert(key.notification.isDefined)
+  //     actRef = TestActorRef[ActuatorActor]
+  //     act = actRef.underlyingActor
+  //     actWsRef = TestActorRef[WebSocketActor]
+  //     actWs = actWsRef.underlyingActor
+  //     actRef ! WebSocketInterface(actWsRef)
+  //     actRef ! WebSocketMessage("""{"token": "%s"}""" format token)
+  //     actRef ! ActorIdentity(identifyId, Some(keyRef))
+  //     assertResult(None)(act.notification)
+  //     assertResult(None)(key.notification)
+  //     assertResult(Some(keyRef))(act.keypad)
+  //     assertResult(Some(actRef))(key.actuator)
+  //   }
+  //   it("Restore when Keypad is disconnected") {
+  //     actRef ! WebSocketMessage("""{"token": "%s"}""" format token)
+  //     keyRef ! WebSocketMessage("""{"token": "%s"}""" format token)
+  //     actRef ! ActorIdentity(identifyId, Some(keyRef))
+  //     keyRef ! Disconnected
+  //     Thread.sleep(100)
+  //     assert(act.keypad.isEmpty)
+  //     assert(act.notification.isDefined)
+  //     keyRef = TestActorRef[KeypadActor]
+  //     key = keyRef.underlyingActor
+  //     keyWsRef = TestActorRef[WebSocketActor]
+  //     keyWs = keyWsRef.underlyingActor
+  //     keyRef ! WebSocketInterface(keyWsRef)
+  //     keyRef ! WebSocketMessage("""{"token": "%s"}""" format token)
+  //     actRef ! ActorIdentity(identifyId, Some(keyRef))
+  //     assertResult(None)(act.notification)
+  //     assertResult(None)(key.notification)
+  //     assertResult(Some(keyRef))(act.keypad)
+  //     assertResult(Some(actRef))(key.actuator)
+  //   }
+  // }
 
   describe("The same token is used twice with the same login type") {
     // describe("If remaining thread exists, request the existing actor to logout") {
