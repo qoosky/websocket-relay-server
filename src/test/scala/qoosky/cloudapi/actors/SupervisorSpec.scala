@@ -26,7 +26,7 @@ class SupervisorSpec extends FunSpec with BeforeAndAfter {
     supervisor.keypads.foreach(_ ! Disconnected)
   }
 
-  describe("Test ExceptionalEvent") {
+  describe("Exceptional event") {
     it("Received string") {
       intercept[RuntimeException] {
         supervisorRef.receive("string")
@@ -39,7 +39,7 @@ class SupervisorSpec extends FunSpec with BeforeAndAfter {
     }
   }
 
-  describe("Actuator Management") {
+  describe("Actuator management") {
     it("Save Actuator actor") {
       val actuatorRef = TestActorRef[ActuatorActor]
       val webSocketRef = TestActorRef[WebSocketActor]
@@ -65,7 +65,7 @@ class SupervisorSpec extends FunSpec with BeforeAndAfter {
     }
   }
 
-  describe("Keypad Management") {
+  describe("Keypad management") {
     it("Save Keypad actor") {
       val keypadRef = TestActorRef[KeypadActor]
       val webSocketRef = TestActorRef[WebSocketActor]
