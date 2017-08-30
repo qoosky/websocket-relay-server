@@ -5,9 +5,15 @@ This repository provides the source code of the WebSocket API server application
 Feel free to test this server application on your host, or fork it and customize to create some more interesting applications.
 
 
-## Screenshots
+## Sequence diagram
 
-TODO
+WebSocket clients such as IoT devices and JavaScript applications upgrade their HTTP connections to communicate over the WebSocket protocol with Akka HTTP server.  Inside Akka HTTP server, there exist two types of actors: `Actuator` for IoT devices and `Keypad` for JavaScript applications.  An Actuator actor first send `ConnectionRequest` to Keypad actors, and a Keypad actor replies if it has the same API token as the Actuator actor.
+
+![LoginSequence](sequences/login_sequence.png)
+
+Once an Actuator actor and a Keypad actor are connected, the IoT device and JavaScript application can send and receive WebSocket messages as if they were directly connected, but in fact there exists the Akka HTTP relay server.
+
+![MessagingSequence](sequences/messaging_sequence.png)
 
 
 ## Languages
