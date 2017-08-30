@@ -1,6 +1,6 @@
 package qoosky.cloudapi.actors
 
-import akka.actor.{ActorIdentity, ActorSystem}
+import akka.actor.ActorSystem
 import akka.testkit.TestActorRef
 import org.scalatest._
 

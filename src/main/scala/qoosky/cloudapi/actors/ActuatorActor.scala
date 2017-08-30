@@ -10,7 +10,6 @@ import scala.language.postfixOps
 class ActuatorActor extends WebSocketHandler {
 
   val logger: Logger = LoggerFactory.getLogger("ActuatorActor")
-  val loginType = "actuator"
   val identifyId = 1
   var keypad: Option[ActorRef] = None
   var schedule: Option[Cancellable] = None
@@ -31,10 +30,10 @@ class ActuatorActor extends WebSocketHandler {
   def authenticated: Receive = {
     case WebSocketMessage(_) => notification.foreach(notify)
     case SearchKeypads => context.actorSelection("/user/KeypadActor-*") ! Identify(identifyId)
-    case ActorIdentity(`identifyId`, Some(ref)) => cid.foreach(ref ! ConnectionRequest(_))
+    case ActorIdentity(`identifyId`, Some(ref)) => token.foreach(ref ! ConnectionRequest(_))
     case ActorIdentity(`identifyId`, None) =>
-    case ConnectionRequest(c) =>
-      if(cid.contains(c)) {
+    case ConnectionRequest(t) =>
+      if(token.contains(t)) {
         context.become(connected)
         schedule.foreach(_.cancel)
         notification = None

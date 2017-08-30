@@ -34,7 +34,6 @@ trait ActorMessage
 case class NewActuator(actuator: ActorRef, webSocket: ActorRef) extends ActorMessage
 case class NewKeypad(keypad: ActorRef, webSocket: ActorRef) extends ActorMessage
 case class Disconnected() extends ActorMessage
-case class DisconnectionRequest(connectionId: String) extends ActorMessage
 case class WebSocketMessage(content: String) extends ActorMessage
 case class FromActorMessage(content: String) extends ActorMessage
 case class WebSocketInterface(webSocket: ActorRef) extends ActorMessage

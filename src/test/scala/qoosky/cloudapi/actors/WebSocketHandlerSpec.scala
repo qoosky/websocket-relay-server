@@ -7,7 +7,6 @@ import org.slf4j.{Logger, LoggerFactory}
 
 class WebSocketHandlerImpl extends WebSocketHandler {
   val logger: Logger = LoggerFactory.getLogger("WebSocketHandlerImpl")
-  val loginType = "dummy"
   def receive: PartialFunction[Any, Unit] = {
     case x => defaultBehavior(x)
   }
@@ -16,7 +15,7 @@ class WebSocketHandlerImpl extends WebSocketHandler {
 class WebSocketHandlerSpec extends FunSpec with BeforeAndAfter {
 
   implicit val system: ActorSystem = ActorSystem("test-cloudapi-system")
-  val validJsonToken = "XXXX-XXXX-XXXX-XXXX"
+  val validToken = "XXXX-XXXX-XXXX-XXXX"
   var wsHandlerRef: TestActorRef[WebSocketHandlerImpl] = _
   var wsHandler: WebSocketHandlerImpl = _
   var wsInterfaceRef: TestActorRef[WebSocketActor] = _
@@ -68,6 +67,27 @@ class WebSocketHandlerSpec extends FunSpec with BeforeAndAfter {
     }
   }
 
+  describe("login") {
+    it("Valid json API token is provided") {
+      assert(wsHandler.login("""{"token": "%s"}""" format validToken)._1)
+      assertResult(Some(validToken))(wsHandler.token)
+    }
+    it("Valid json but invalid API token is provided") {
+      assert(!wsHandler.login("""{"key": "%s"}""" format validToken)._1)
+      assertResult(None)(wsHandler.token)
+    }
+    it("Invalid json string") {
+      assert(!wsHandler.login("mystring")._1)
+      assertResult(None)(wsHandler.token)
+    }
+    it("Login fails if the same token is used for the same WebSocketHandler") {
+      assert(wsHandler.login("""{"token": "%s"}""" format validToken)._1)
+      assertResult(Some(validToken))(wsHandler.token)
+      assert(!wsHandler.login("""{"token": "%s"}""" format validToken)._1)
+      assertResult(Some(validToken))(wsHandler.token)
+    }
+  }
+
   describe("WebSocketInterface management") {
     it("WebSocketHandler saves WebSocketInterface") {
       wsHandlerRef ! WebSocketInterface(wsInterfaceRef)
@@ -91,59 +111,4 @@ class WebSocketHandlerSpec extends FunSpec with BeforeAndAfter {
       }
     }
   }
-
-  describe("login") {
-    it("Valid json API token is provided") {
-      assert(wsHandler.login("""{"token": "%s"}""" format validJsonToken)._1)
-      assertResult(Some(validJsonToken))(wsHandler.cid)
-    }
-    it("Valid json but invalid API token is provided") {
-      assert(!wsHandler.login("""{"key": "%s"}""" format validJsonToken)._1)
-      assertResult(None)(wsHandler.cid)
-    }
-    it("Invalid json string") {
-      assert(!wsHandler.login("mystring")._1)
-      assertResult(None)(wsHandler.cid)
-    }
-    it("Login fails if the same token is used for the same WebSocketHandler") {
-      assert(wsHandler.login("""{"token": "%s"}""" format validJsonToken)._1)
-      assertResult(Some(validJsonToken))(wsHandler.cid)
-      assert(!wsHandler.login("""{"token": "%s"}""" format validJsonToken)._1)
-      assertResult(Some(validJsonToken))(wsHandler.cid)
-    }
-  }
-
-  // TODO
-  // describe("searchPairCid test") {
-  //   it("search setCid completed pair") {
-  //     assert(actuator.setCid(validJsonToken))
-  //     assert(keypad.setCid(validJsonToken))
-  //     assertResult(keypad.cid)(actuator.searchPairCid(validJsonToken))
-  //     assertResult(actuator.cid)(keypad.searchPairCid(validJsonToken))
-  //   }
-  //   it("pair does not exist") {
-  //     assertResult(None)(actuator.searchPairCid(validJsonToken))
-  //     assertResult(None)(keypad.searchPairCid(validJsonToken))
-  //   }
-  // }
-
-  // TODO
-  // describe("searchComradeCid test") {
-  //   it("search setCid completed comrade") {
-  //     assert(actuator.setCid(validJsonToken))
-  //     assert(keypad.setCid(validJsonToken))
-  //     assertResult(actuator.cid)(actuator2.searchComradeCid(validJsonToken))
-  //     assertResult(keypad.cid)(keypad2.searchComradeCid(validJsonToken))
-  //   }
-  //   it("comrade does not exist") {
-  //     assertResult(None)(actuator.searchComradeCid(validJsonToken))
-  //     assertResult(None)(keypad.searchComradeCid(validJsonToken))
-  //   }
-  //   it("self cid cannot be searched") {
-  //     assert(actuator.setCid(validJsonToken))
-  //     assert(keypad.setCid(validJsonToken))
-  //     assertResult(None)(actuator.searchComradeCid(validJsonToken))
-  //     assertResult(None)(keypad.searchComradeCid(validJsonToken))
-  //   }
-  // }
 }

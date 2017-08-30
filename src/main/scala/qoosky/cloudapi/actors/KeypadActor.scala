@@ -6,7 +6,6 @@ import org.slf4j.{Logger, LoggerFactory}
 class KeypadActor extends WebSocketHandler {
 
   val logger: Logger = LoggerFactory.getLogger("KeypadActor")
-  val loginType = "keypad"
   var actuator: Option[ActorRef] = None
   notification = Some("""Please send your Qoosky API token in the following json format, {"token":"XXXX-XXXX-XXXX-XXXX"}""")
 
@@ -23,13 +22,13 @@ class KeypadActor extends WebSocketHandler {
 
   def authenticated: Receive = {
     case WebSocketMessage(_) => notification.foreach(notify)
-    case ConnectionRequest(c) =>
-      if(cid.contains(c)) {
+    case ConnectionRequest(t) =>
+      if(token.contains(t)) {
         context.become(connected)
         notification = None
         actuator = Some(sender)
         actuator.foreach(context.watch)
-        cid.foreach(sender ! ConnectionRequest(_))
+        token.foreach(sender ! ConnectionRequest(_))
         notify("Successfully connected to your actuator device.")
       }
     case x => defaultBehavior(x)
