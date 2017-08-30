@@ -1,0 +1,32 @@
+<html>
+<body>
+<a href="#" onclick="send()">Send</a>
+<script type="text/javascript">
+var ws = new WebSocket("ws://localhost:8080/v1/controller/keypad/ws");
+
+function send(){
+  ws.send('{"token":"XXXX-XXXX-XXXX-XXXX"}');
+}
+
+ws.onopen = function(){
+  console.log('Initialization Success');
+}
+
+ws.onmessage = function(message){
+  console.log('received : ' + message.data);
+}
+
+ws.onerror = function(){
+  console.log('Error!');
+}
+
+ws.onclose = function(){
+  console.log('Connection Close!');
+}
+
+window.onbeforeunload = function(){
+  ws.onclose();
+}
+</script>
+</body>
+</html>

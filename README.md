@@ -2,10 +2,10 @@
 
 This repository provides the source code of the WebSocket API server application hosted on [Qoosky](https://www.qoosky.io/).  Users can connect their IoT devices such as Raspberry Pi, Arduino, and Android Things to the server using WebSocket with a pre-generated API token.  They can control their devices with the corresponding JavaScript WebSocket client of the same API token available at  https://www.qoosky.io/account/api/cc using their PC or smartphone browsers.  Qoosky API server relays WebSocket messages from IoT devices or JavaScript clients to the other corresponding clients in real-time.
 
-Feel free to test this server application on your host, or fork it and customize to create some more interesting applications.
+Feel free to test this server application on your host, or fork it and customize to create some more interesting applications.  Sample WebSocket clients are available at `clients/` directory or other Qoosky GitHub repository: https://github.com/qoosky/websocket_clients
 
 
-## Sequence diagram
+## Sequence diagrams
 
 WebSocket clients such as IoT devices and JavaScript applications upgrade their HTTP connections to communicate over the WebSocket protocol with Akka HTTP server.  Inside Akka HTTP server, there exist two types of actors: `Actuator` for IoT devices and `Keypad` for JavaScript applications.  An Actuator actor first send `ConnectionRequest` to Keypad actors, and a Keypad actor replies if it has the same API token as the Actuator actor.
 
