@@ -7,10 +7,7 @@ Feel free to test this server application on your host, or fork it and customize
 
 ## Screenshots
 
-	README.md (here)
-	src/test/scala/qoosky/cloudapi/actors/ActuatorActorKeypadActorSpec.scala
-	src/main/scala/qoosky/cloudapi/actors/ActuatorActor.scala
-	src/main/scala/qoosky/cloudapi/actors/KeypadActor.scala
+TODO
 
 
 ## Languages

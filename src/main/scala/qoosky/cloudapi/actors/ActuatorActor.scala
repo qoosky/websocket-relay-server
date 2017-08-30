@@ -47,6 +47,7 @@ class ActuatorActor extends WebSocketHandler {
   def connected: Receive = {
     case WebSocketMessage(s) => keypad.foreach(_ ! FromActorMessage(s))
     case FromActorMessage(s) => sendRaw(s)
+    case ConnectionRequest(t) => if(token.contains(t)) sender ! Disconnected
     case Terminated(ref) if keypad.contains(ref) =>
       keypad = None
       context.become(authenticated)
