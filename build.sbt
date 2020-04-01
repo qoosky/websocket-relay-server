@@ -25,7 +25,7 @@
 lazy val root = (project in file(".")).
   settings(
     name := "websocket-relay-server",
-    version := "1.0",
+    version := "1.1",
     scalaVersion := "2.13.1",
     mainClass in assembly := Some("qoosky.websocketrelayserver.Main"),
     retrieveManaged := true,

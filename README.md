@@ -43,7 +43,7 @@ Run application at http://localhost:8080/
 Build fat JAR
 
 	sbt assembly
-	java -jar target/scala-2.13/websocket-relay-server-assembly-1.0.jar
+	java -jar target/scala-2.13/websocket-relay-server-assembly-1.1.jar
 
 
 ## License
