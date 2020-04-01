@@ -1,4 +1,4 @@
-package qoosky.cloudapi.actors
+package qoosky.websocketrelayserver.actors
 
 import akka.actor.{Actor, ActorRef, Terminated}
 import spray.json.DefaultJsonProtocol._

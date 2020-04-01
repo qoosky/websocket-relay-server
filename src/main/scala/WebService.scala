@@ -1,4 +1,4 @@
-package qoosky.cloudapi
+package qoosky.websocketrelayserver
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.http.scaladsl.model.ws._
@@ -7,7 +7,7 @@ import akka.http.scaladsl.server.Route
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl._
 import org.slf4j.{Logger, LoggerFactory}
-import qoosky.cloudapi.actors._
+import qoosky.websocketrelayserver.actors._
 
 class WebService(system: ActorSystem) {
 
@@ -42,7 +42,7 @@ class WebService(system: ActorSystem) {
     Flow.fromSinkAndSource(in, out)
   }
 
-  // JavaScript Client (AngularJS)
+  // JavaScript Client (Hosted on qoosky.io)
   def keypadWebSocketService: Flow[Message, Message, _] = {
     val keypad: ActorRef = system.actorOf(Props[KeypadActor], name = "KeypadActor-%d".format(keypadId))
     val fromActor: Source[ActorMessage, _] = Source.actorRef[ActorMessage](bufferSize = webSocketBufferSize, OverflowStrategy.dropHead).mapMaterializedValue{ webSocket: ActorRef =>
@@ -62,14 +62,14 @@ class WebService(system: ActorSystem) {
   } ~
   pathPrefix("v1") {
     pathEndOrSingleSlash {
-      complete("Available API endpoints: /v1/controller/actuator/ws")
+      complete("Available API endpoints: /v1/websocket-relay-server/actuator/ws")
     } ~
-    pathPrefix("controller" / "actuator" / "ws") {
+    pathPrefix("websocket-relay-server" / "actuator" / "ws") {
       pathEndOrSingleSlash {
         handleWebSocketMessages(actuatorWebSocketService)
       }
     } ~
-    pathPrefix("controller" / "keypad" / "ws") {
+    pathPrefix("websocket-relay-server" / "keypad" / "ws") {
       pathEndOrSingleSlash {
         handleWebSocketMessages(keypadWebSocketService)
       }

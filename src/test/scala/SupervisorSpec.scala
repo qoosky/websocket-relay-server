@@ -1,7 +1,8 @@
-package qoosky.cloudapi.actors
+package qoosky.websocketrelayserver.actors
 
 import akka.actor.{Actor, ActorSystem}
 import akka.testkit.TestActorRef
+import org.scalatest.funspec.AnyFunSpec
 import org.scalatest._
 
 class WebSocketActor extends Actor {
@@ -12,9 +13,9 @@ class WebSocketActor extends Actor {
   }
 }
 
-class SupervisorSpec extends FunSpec with BeforeAndAfter {
+class SupervisorSpec extends AnyFunSpec with BeforeAndAfter {
 
-  implicit val system: ActorSystem = ActorSystem("test-cloudapi-system")
+  implicit val system: ActorSystem = ActorSystem("test-websocketrelayserver-system")
   val supervisorRef: TestActorRef[Supervisor] = TestActorRef[Supervisor]
   val supervisor: Supervisor = supervisorRef.underlyingActor
 

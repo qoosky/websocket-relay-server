@@ -1,7 +1,8 @@
-package qoosky.cloudapi.actors
+package qoosky.websocketrelayserver.actors
 
 import akka.actor.{ActorSystem, IllegalActorStateException}
 import akka.testkit.TestActorRef
+import org.scalatest.funspec.AnyFunSpec
 import org.scalatest._
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -12,9 +13,9 @@ class WebSocketHandlerImpl extends WebSocketHandler {
   }
 }
 
-class WebSocketHandlerSpec extends FunSpec with BeforeAndAfter {
+class WebSocketHandlerSpec extends AnyFunSpec with BeforeAndAfter {
 
-  implicit val system: ActorSystem = ActorSystem("test-cloudapi-system")
+  implicit val system: ActorSystem = ActorSystem("test-websocketrelayserver-system")
   val validToken = "XXXX-XXXX-XXXX-XXXX"
   var wsHandlerRef: TestActorRef[WebSocketHandlerImpl] = _
   var wsHandler: WebSocketHandlerImpl = _

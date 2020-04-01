@@ -1,4 +1,4 @@
-package qoosky.cloudapi.actors
+package qoosky.websocketrelayserver.actors
 
 import akka.actor.{ActorIdentity, ActorRef, Cancellable, Identify, Terminated}
 import org.slf4j.{Logger, LoggerFactory}
@@ -21,7 +21,7 @@ class ActuatorActor extends WebSocketHandler {
       notify(res._2)
       if (res._1) {
         context.become(authenticated)
-        notification = Some("Searching for your cloud controller device...")
+        notification = Some("Searching for your controller device...")
         schedule = Some(context.system.scheduler.schedule(1 seconds, 3 seconds, self, SearchKeypads))
       }
     case x => defaultBehavior(x)
@@ -39,7 +39,7 @@ class ActuatorActor extends WebSocketHandler {
         notification = None
         keypad = Some(sender)
         keypad.foreach(context.watch)
-        notify("Successfully connected to your cloud controller device.")
+        notify("Successfully connected to your controller device.")
       }
     case x => defaultBehavior(x)
   }
@@ -51,7 +51,7 @@ class ActuatorActor extends WebSocketHandler {
     case Terminated(ref) if keypad.contains(ref) =>
       keypad = None
       context.become(authenticated)
-      notification = Some("Disconnected. Re-searching for your cloud controller device...")
+      notification = Some("Disconnected. Re-searching for your controller device...")
       schedule = Some(context.system.scheduler.schedule(1 seconds, 3 seconds, self, SearchKeypads))
     case x => defaultBehavior(x)
   }

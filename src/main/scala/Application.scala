@@ -1,4 +1,4 @@
-package qoosky.cloudapi
+package qoosky.websocketrelayserver
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
@@ -13,7 +13,7 @@ class Application extends ApplicationLifecycle {
 
   val config: Config = ConfigFactory.load
   val logger: Logger = LoggerFactory.getLogger("Application")
-  val applicationName = "websocket_relay_server"
+  val applicationName = "websocketrelayserver"
 
   implicit val system: ActorSystem = ActorSystem(s"$applicationName-system")
   implicit val materializer: ActorMaterializer = ActorMaterializer()
@@ -29,9 +29,9 @@ class Application extends ApplicationLifecycle {
   def start(): Unit = {
     logger.info(s"Starting $applicationName Service")
     if (!started) {
-      val defaultInterface = config.getString("qoosky.cloudapi.interface")
-      val defaultPort = config.getInt("qoosky.cloudapi.port")
-      val port = System.getProperty("qoosky.cloudapi.port", defaultPort.toString).toInt
+      val defaultInterface = config.getString("qoosky.websocketrelayserver.interface")
+      val defaultPort = config.getInt("qoosky.websocketrelayserver.port")
+      val port = System.getProperty("qoosky.websocketrelayserver.port", defaultPort.toString).toInt
       bindingFuture = Some(Http().bindAndHandle(service.route, defaultInterface, port))
       started = true
       bindingFuture.foreach(_.onComplete {

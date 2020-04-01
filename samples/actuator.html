@@ -2,7 +2,7 @@
 <body>
 <a href="#" onclick="send()">Send</a>
 <script type="text/javascript">
-var ws = new WebSocket("ws://localhost:8080/v1/controller/actuator/ws");
+var ws = new WebSocket("ws://localhost:8080/v1/websocket-relay-server/actuator/ws");
 
 function send(){
   ws.send('{"token":"XXXX-XXXX-XXXX-XXXX"}');

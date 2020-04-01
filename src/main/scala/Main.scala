@@ -1,4 +1,4 @@
-package qoosky.cloudapi
+package qoosky.websocketrelayserver
 
 import org.apache.commons.daemon._
 import org.slf4j.LoggerFactory

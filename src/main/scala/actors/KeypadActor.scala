@@ -1,4 +1,4 @@
-package qoosky.cloudapi.actors
+package qoosky.websocketrelayserver.actors
 
 import akka.actor.{ActorRef, Terminated}
 import org.slf4j.{Logger, LoggerFactory}

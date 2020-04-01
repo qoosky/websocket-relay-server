@@ -1,12 +1,13 @@
-package qoosky.cloudapi.actors
+package qoosky.websocketrelayserver.actors
 
 import akka.actor.{ActorIdentity, ActorSystem}
 import akka.testkit.TestActorRef
+import org.scalatest.funspec.AnyFunSpec
 import org.scalatest._
 
-class ActuatorActorKeypadActorSpec extends FunSpec with BeforeAndAfter {
+class ActuatorActorKeypadActorSpec extends AnyFunSpec with BeforeAndAfter {
 
-  implicit val system: ActorSystem = ActorSystem("test-cloudapi-system")
+  implicit val system: ActorSystem = ActorSystem("test-websocketrelayserver-system")
 
   var actRef: TestActorRef[ActuatorActor] = _
   var act: ActuatorActor = _
