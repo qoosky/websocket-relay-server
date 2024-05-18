@@ -42,7 +42,7 @@ class WebService(system: ActorSystem) {
     Flow.fromSinkAndSource(in, out)
   }
 
-  // JavaScript Client (Hosted on qoosky.io)
+  // JavaScript Client (Hosted on qoosky.dev)
   def keypadWebSocketService: Flow[Message, Message, _] = {
     val keypad: ActorRef = system.actorOf(Props[KeypadActor], name = "KeypadActor-%d".format(keypadId))
     val fromActor: Source[ActorMessage, _] = Source.actorRef[ActorMessage](bufferSize = webSocketBufferSize, OverflowStrategy.dropHead).mapMaterializedValue{ webSocket: ActorRef =>
