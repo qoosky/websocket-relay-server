@@ -2,7 +2,7 @@
 
 WebSocket Relay Server is an API application hosted on [Qoosky](https://www.qoosky.dev/). Devices such as Raspberry Pi, Arduino, and Android Things can be controlled in real-time through the Internet using the API from PCs and smartphones.
 
-- API token is required to connect to the server, which is available in this page: https://www.qoosky.dev/account/api/cc
+- API token is required to connect to the server, which is described in this page: https://www.qoosky.dev/docs/apis/
 - WebSocket client samples are available here https://github.com/qoosky/websocket-clients
 
 
